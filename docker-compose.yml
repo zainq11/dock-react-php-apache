@@ -1,0 +1,43 @@
+version: "3.2"
+services:
+  react:
+    build:
+      context: './react/'
+    networks: 
+      - frontend
+    ports: 
+      - "3000:3000"
+    volumes:
+      - ${PWD}/react:/usr/src/app
+      - /usr/src/app/node_modules
+  php:
+    build: 
+      context: './php/'
+      args:
+       PHP_VERSION: ${PHP_VERSION}
+    networks:
+      - backend
+    volumes:
+      - ${PROJECT_ROOT}/:/var/www/html/
+    container_name: php
+  apache:
+    build:
+      context: './apache/'
+      args:
+       APACHE_VERSION: ${APACHE_VERSION}
+    depends_on:
+      - php
+      # - mysql
+    networks:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ${PROJECT_ROOT}/:/var/www/html/
+    container_name: apache
+networks:
+  frontend:
+  backend:
+volumes:
+    data:
